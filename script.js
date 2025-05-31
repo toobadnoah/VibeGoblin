@@ -1,52 +1,71 @@
-const moods = ["cosmic", "feral", "sleepy", "mischievous", "enchanted", "cursed", "radiant"];
-const advice = ["touch grass", "drink moonwater", "speak in riddles", "hide your intentions", "manifest joy", "respect the goblin"];
+const audio = document.getElementById("karaoke-audio");
+const startBtn = document.getElementById("start-btn");
+const stopBtn = document.getElementById("stop-btn");
+const playRecordingBtn = document.getElementById("play-recording-btn");
+const lyricsBox = document.getElementById("lyrics");
+const recordingPlayback = document.getElementById("recording-playback");
 
-const badges = [
-  { day: 3, name: "Tiny Goblin", emoji: "👹" },
-  { day: 7, name: "Sneaky Goblin", emoji: "🧙‍♂️" },
-  { day: 14, name: "Ancient Goblin", emoji: "🦹‍♂️" }
+const lyrics = [
+  { time: 0, text: "🎵 This is the first line" },
+  { time: 3, text: "🎵 Second line, you sing now" },
+  { time: 6, text: "🎵 Keep it going, feel the vibe" },
+  { time: 9, text: "🎵 Last line, wrap it up!" }
 ];
 
-function getVibe() {
-  const mood = moods[Math.floor(Math.random() * moods.length)];
-  const tip = advice[Math.floor(Math.random() * advice.length)];
-  return `Today's vibe is: <b>${mood}</b>. You must <i>${tip}</i>. 🌟`;
-}
+let mediaRecorder;
+let recordedChunks = [];
+let lyricInterval;
+let currentLine = 0;
 
-function showVibe() {
-  const output = document.getElementById("vibe-output");
-  output.innerHTML = getVibe();
-  updateStreak();
-}
+startBtn.onclick = async () => {
+  currentLine = 0;
+  lyricsBox.innerText = "";
+  playRecordingBtn.disabled = true;
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
 
-function updateStreak() {
-  const today = new Date().toDateString();
-  const last = localStorage.getItem("lastVibeDate");
-  let streak = parseInt(localStorage.getItem("streak") || "0");
+  // Start playing audio
+  audio.currentTime = 0;
+  audio.play();
 
-  if (last !== today) {
-    streak += 1;
-    localStorage.setItem("lastVibeDate", today);
-    localStorage.setItem("streak", streak);
-  }
+  // Start recording
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  mediaRecorder = new MediaRecorder(stream);
+  recordedChunks = [];
 
-  document.getElementById("streak").innerText = `🔥 Streak: ${streak} day${streak !== 1 ? 's' : ''}`;
-  updateBadges(streak);
-}
+  mediaRecorder.ondataavailable = event => {
+    if (event.data.size > 0) recordedChunks.push(event.data);
+  };
 
-function updateBadges(streak) {
-  const badgeContainer = document.getElementById("badge-container");
-  badgeContainer.innerHTML = ""; // clear existing badges
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recordedChunks, { type: "audio/webm" });
+    recordingPlayback.src = URL.createObjectURL(blob);
+    recordingPlayback.style.display = "block";
+    playRecordingBtn.disabled = false;
+  };
 
-  badges.forEach(badge => {
-    if (streak >= badge.day) {
-      const badgeEl = document.createElement("div");
-      badgeEl.classList.add("badge");
-      badgeEl.innerHTML = `${badge.emoji} <strong>${badge.name}</strong>`;
-      badgeContainer.appendChild(badgeEl);
+  mediaRecorder.start();
+
+  // Start lyrics sync
+  lyricInterval = setInterval(() => {
+    const currentTime = Math.floor(audio.currentTime);
+    if (lyrics[currentLine] && currentTime >= lyrics[currentLine].time) {
+      lyricsBox.innerText = lyrics[currentLine].text;
+      currentLine++;
     }
-  });
-}
+  }, 500);
+};
 
-// Show streak and badges on page load
-updateStreak();
+stopBtn.onclick = () => {
+  audio.pause();
+  audio.currentTime = 0;
+  mediaRecorder.stop();
+  clearInterval(lyricInterval);
+  lyricsBox.innerText = "✨ Done! You can now replay your voice.";
+  stopBtn.disabled = true;
+  startBtn.disabled = false;
+};
+
+playRecordingBtn.onclick = () => {
+  recordingPlayback.play();
+};
