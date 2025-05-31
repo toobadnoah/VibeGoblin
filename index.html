@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vibe Goblin Karaoke - Burger Flip Challenge</title>
+<style>
+  body {
+    margin: 0;
+    background: #121212;
+    color: #7aff90;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    user-select: none;
+  }
+
+  h1 {
+    margin: 20px 0 5px;
+    font-weight: 900;
+    text-shadow: 0 0 8px #7aff90;
+  }
+
+  #gameArea {
+    width: 320px;
+    max-width: 90vw;
+    background: #1a1a1a;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 20px #4caf50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #burger {
+    width: 150px;
+    height: 150px;
+    background: #3e7a22;
+    border-radius: 40% 40% 30% 30% / 60% 60% 40% 40%;
+    box-shadow: inset 0 6px 10px #5fa933, 0 6px 15px #2d5c10;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #c0ff81;
+    font-weight: 700;
+    font-size: 2rem;
+    text-shadow: 0 0 4px #88ff55;
+    user-select: none;
+  }
+
+  #scoreBoard {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+
+  #timeBarContainer {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    background: #222;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 30px;
+  }
+
+  #movingBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    height: 100%;
+    background: #7aff90;
+    border-radius: 15px;
+    box-shadow: 0 0 15px #7aff90;
+  }
+
+  #targetZone {
+    position: absolute;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 3px solid #7aff90;
+    top: 0;
+    border-radius: 15px;
+    pointer-events: none;
+    box-shadow: 0 0 10px #7aff90 inset;
+    width: 15%;
+    left: 0;
+  }
+
+  #controls {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  button {
+    background: #1a1a1a;
+    border: 2px solid #7aff90;
+    border-radius: 12px;
+    color: #7aff90;
+    padding: 12px 18px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex: 1;
+  }
+
+  button:hover:not(:disabled) {
+    background-color: #7aff90;
+    color: #121212;
+  }
+
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  #log {
+    margin-top: 20px;
+    width: 100%;
+    height: 100px;
+    background: #0f0f0f;
+    border: 1px solid #7aff90;
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #7aff90;
+    overflow-y: auto;
+    font-family: monospace;
+  }
+
+  @media (max-width: 400px) {
+    #burger {
+      width: 120px;
+      height: 120px;
+      font-size: 1.6rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Vibe Goblin Karaoke<br>Burger Flip Challenge</h1>
+
+<div id="gameArea">
+  <div id="burger">🍔</div>
+
+  <div id="scoreBoard">
+    <div id="score">Score: 0</div>
+    <div id="combo">Combo: 0</div>
+    <div id="lives">Lives: 3</div>
+    <div id="time">Time: 10</div>
+  </div>
+
+  <div id="timeBarContainer" aria-label="Time bar with moving zone">
+    <div id="targetZone"></div>
+    <div id="movingBar"></div>
+  </div>
+
+  <div id="controls">
+    <button id="startButton" aria-label="Start game">Start</button>
+    <button id="flipButton" aria-label="Flip burger" disabled>Flip!</button>
+    <button id="pauseButton" aria-label="Pause game" style="display:none;">Pause</button>
+    <button id="restartButton" aria-label="Restart game" style="display:none;">Restart</button>
+  </div>
+
+  <div id="log" aria-live="polite" aria-atomic="true"></div>
+</div>
+
+<script>
+  const burger = document.getElementById('burger');
+  const startButton = document.getElementById('startButton');
+  const flipButton = document.getElementById('flipButton');
+  const pauseButton = document.getElementById('pauseButton');
+  const restartButton = document.getElementById('restartButton');
+
+  const scoreDisplay = document.getElementById('score');
+  const comboDisplay = document.getElementById('combo');
+  const livesDisplay = document.getElementById('lives');
+  const timeDisplay = document.getElementById('time');
+  const log = document.getElementById('log');
+
+  const movingBar = document.getElementById('movingBar');
+  const targetZoneElem = document.getElementById('targetZone');
+  const timeBarContainer = document.getElementById('timeBarContainer');
+
+  let score = 0;
+  let combo = 0;
+  let lives = 3;
+  let time = 10;
+  let speed = 2000; // ms per full moving bar cycle
+
+  let gameActive = false;
+  let paused = false;
+  let countdownInterval;
+
+  // Moving bar animation variables
+  let movingBarStartTime;
+  let movingBarAnimationFrame;
+
+  // Target zone dynamic properties
+  let targetZone = {
+    leftPercent: 0,
+    widthPercent: 15,
+    direction: 1,
+    speed: 0.15, // % per frame approx
+  };
+
+  function logMessage(msg) {
+    log.textContent = msg;
+  }
+
+  function updateUI() {
+    scoreDisplay.textContent = `Score: ${score}`;
+    comboDisplay.textContent = `Combo: ${combo}`;
+    livesDisplay.textContent = `Lives: ${lives}`;
+    timeDisplay.textContent = `Time: ${time}`;
+  }
+
+  function setMovingBarSpeed(msPerCycle) {
+    speed = msPerCycle;
+  }
+
+  function startMovingBar() {
+    movingBarStartTime = performance.now();
+    movingBar.style.left = '0%';
+    movingBarAnimationFrame = requestAnimationFrame(animateMovingBar);
+  }
+
+  function pauseMovingBar() {
+    cancelAnimationFrame(movingBarAnimationFrame);
+  }
+
+  function animateMovingBar(timestamp) {
+    if (!gameActive || paused) {
+      movingBarAnimationFrame = requestAnimationFrame(animateMovingBar);
+      return;
+    }
+
+    const elapsed = (timestamp - movingBarStartTime) % speed;
+    const progressPercent = (elapsed / speed) * 100;
+
+    // Move bar left to right and back (ping pong)
+    const posPercent = progressPercent <= 50 ? progressPercent * 2 : 200 - progressPercent * 2;
+    movingBar.style.left = `${posPercent}%`;
+
+    movingBarAnimationFrame = requestAnimationFrame(animateMovingBar);
+  }
+
+  // Target zone animation loop
+  function animateTargetZone() {
+    if (!gameActive || paused) {
+      requestAnimationFrame(animateTargetZone);
+      return;
+    }
+
+    targetZone.leftPercent += targetZone.speed * targetZone.direction;
+
+    if (targetZone.leftPercent <= 0) {
+      targetZone.leftPercent = 0;
+      targetZone.direction = 1;
+    } else if (targetZone.leftPercent + targetZone.widthPercent >= 100) {
+      targetZone.leftPercent = 100 - targetZone.widthPercent;
+      targetZone.direction = -1;
+    }
+
+    targetZoneElem.style.left = targetZone.leftPercent + '%';
+
+    requestAnimationFrame(animateTargetZone);
+  }
+
+  function randomizeTargetZone() {
+    if (!gameActive) return;
+
+    targetZone.widthPercent = 10 + Math.random() * 15;
+    targetZoneElem.style.width = targetZone.widthPercent + '%';
+
+    targetZone.speed = 0.1 + Math.random() * 0.15;
+
+    targetZone.direction = Math.random() > 0.5 ? 1 : -1;
+
+    targetZone.leftPercent = Math.random() * (100 - targetZone.widthPercent);
+    targetZoneElem.style.left = targetZone.leftPercent + '%';
+  }
+
+  let targetZoneRandomizeInterval;
+
+  function startTargetZoneDynamics() {
+    randomizeTargetZone();
+    targetZoneRandomizeInterval = setInterval(() => {
+      if (!gameActive) {
+        clearInterval(targetZoneRandomizeInterval);
+        return;
+      }
+      randomizeTargetZone();
+    }, 5000);
+    animateTargetZone();
+  }
+
+  function stopTargetZoneDynamics() {
+    clearInterval(targetZoneRandomizeInterval);
+  }
+
+  // Flip logic: Check if moving bar is inside target zone when flipped
+  function flipBurger() {
+    if (!gameActive || paused) return;
+
+    const movingBarLeft = parseFloat(movingBar.style.left) || 0;
+    const movingBarWidthPercent = parseFloat(movingBar.style.width) || 25;
+
+    // movingBarLeft is % of container width
+    // Check if movingBar fully or partially overlaps target zone
+
+    const movingBarRight = movingBarLeft + movingBarWidthPercent;
+    const targetLeft = targetZone.leftPercent;
+    const targetRight = targetZone.leftPercent + targetZone.widthPercent;
+
+    // Calculate overlap (simple check: does moving bar left or right intersect target zone)
+    const overlap = Math.min(movingBarRight, targetRight) - Math.max(movingBarLeft, targetLeft);
+
+    logMessage(`Flip at movingBar ${movingBarLeft.toFixed(1)}% - Target zone ${targetLeft.toFixed(1)}%`);
+
+    if (overlap > 0) {
+      // Success
+      combo++;
+      score += 10 * combo;
+      logMessage(`🟢 Perfect flip! Combo x${combo}`);
+    } else {
+      // Fail
+      lives--;
+      combo = 0;
+      logMessage(`🔴 Missed! Lives left: ${lives}`);
+    }
+
+    updateUI();
+
+    if (lives <= 0) {
+      endGame();
+    }
+  }
+
+  function startGame() {
+    if (gameActive) return;
+    score = 0;
+    combo = 0;
+    lives = 3;
+    time = 10;
+    speed = 2000;
+    gameActive = true;
+    paused = false;
+
+    updateUI();
+    flipButton.disabled = false;
+    startButton.disabled = true;
+    pauseButton.style.display = 'inline-block';
+    restartButton.style.display = 'none';
+
+    startMovingBar();
+    startTargetZoneDynamics();
+
+    pauseButton.textContent = 'Pause';
+    pauseButton.setAttribute('aria-pressed', 'false');
+
+    countdownInterval = setInterval(() => {
+      if (paused) return;
+
+      time--;
+      updateUI();
+
+      if (time % 3 === 0 && speed > 600) {
+        speed -= 250;
+        setMovingBarSpeed(speed);
+      }
+
+      if (time <= 0 || lives <= 0) {
+        endGame();
+      }
+    }, 1000);
+
+    logMessage('Game started! Flip those burgers!');
+  }
+
+  function pauseGame() {
+    if (!gameActive) return;
+
+    paused = !paused;
+    if (paused) {
+      pauseButton.textContent = 'Resume';
+      pauseButton.setAttribute('aria-pressed', 'true');
+      pauseMovingBar();
+      logMessage('Game paused.');
+    } else {
+      pauseButton.textContent = 'Pause';
+      pauseButton.setAttribute('aria-pressed', 'false');
+      startMovingBar();
+      animateTargetZone();
+      logMessage('Game resumed.');
+    }
+  }
+
+  function endGame() {
+    gameActive = false;
+    paused = false;
+    pauseMovingBar();
+    stopTargetZoneDynamics();
+    clearInterval(countdownInterval);
+    flipButton.disabled = true;
+    startButton.disabled = false;
+    pauseButton.style.display = 'none';
+    restartButton.style.display = 'inline-block';
+
+    alert(`⏰ Game Over! Your final score: ${score}`);
+    logMessage(`Game over! Final score: ${score}`);
+  }
+
+  function restartGame() {
+    score = 0;
+    combo = 0;
+    lives = 3;
+    time = 10;
+    speed = 2000;
+    updateUI();
+    flipButton.disabled = false;
+    restartButton.style.display = 'none';
+    pauseButton.style.display = 'inline-block';
+    startButton.disabled = true;
+    gameActive = true;
+    paused = false;
+
+    startMovingBar();
+    startTargetZoneDynamics();
+
+    countdownInterval = setInterval(() => {
+      if (paused) return;
+
+      time--;
+      updateUI();
+
+      if (time % 3 === 0 && speed > 600) {
+        speed -= 250;
+        setMovingBarSpeed(speed);
+      }
+
+      if (time <= 0 || lives <= 0) {
+        endGame();
+      }
+    }, 1000);
+
+    logMessage('Game restarted! Let’s flip!');
+  }
+
+  // Event listeners
+  startButton.addEventListener('click', startGame);
+  flipButton.addEventListener('click', flipBurger);
+  pauseButton.addEventListener('click', pauseGame);
+  restartButton.addEventListener('click', restartGame);
+
+  // Disable context menu on burger for better UX
+  burger.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+
+</body>
+</html>
