@@ -1,6 +1,7 @@
+
 body {
-  background: #2E0854;
-  color: #F4D1FF;
+  background: #1C0F30;
+  color: #F8F4FF;
   font-family: 'Comic Sans MS', cursive, sans-serif;
   text-align: center;
   padding: 40px;
@@ -9,34 +10,39 @@ body {
 .container {
   max-width: 400px;
   margin: auto;
-  background: #DCA6E0;
+  background: #F5D0F9;
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 0 15px 3px #E072D5;
+  box-shadow: 0 0 15px 3px #C68BD2;
 }
 
 #vibeBox {
   font-size: 24px;
   margin: 20px 0;
   padding: 15px;
-  background: #E3B6E9;
+  background: #F5D0F9;
   border-radius: 12px;
   min-height: 60px;
-  box-shadow: inset 0 0 10px #B3388F;
+  box-shadow: inset 0 0 10px #C68BD2;
+  color: #1C0F30;
 }
 
 button {
   padding: 12px 20px;
   font-size: 18px;
-  background-color: #B3388F;
+  background-color: #91288D;
   border: none;
-  color: #F4D1FF;
+  color: #F8F4FF;
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #E072D5;
-  box-shadow: 0 0 10px #F4D1FF;
+  background-color: #D96DCD;
+  box-shadow: 0 0 10px #F8F4FF;
+}
+
+#shareHint {
+  color: #F8F4FF;
 }
