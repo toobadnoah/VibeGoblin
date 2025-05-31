@@ -2,28 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vibe Goblin Karaoke</title>
-  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #6b8e23, #556b2f);
+      color: #f0e68c;
+      margin: 0; padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    header {
+      padding: 1rem;
+      font-size: 2rem;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px #222;
+      user-select: none;
+    }
+    main {
+      flex: 1;
+      max-width: 480px;
+      width: 90vw;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-bottom: 1rem;
+    }
+    select, button {
+      font-size: 1.2rem;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      box-shadow: 0 0 6px #333 inset;
+      background-color: #9acd32;
+      color: #222;
+      font-weight: bold;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    select:hover, button:hover {
+      background-color: #7caf22;
+    }
+    #lyrics {
+      min-height: 6rem;
+      font-size: 1.6rem;
+      line-height: 1.4;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      box-shadow: 0 0 12px 2px #8fbc8f;
+      text-align: center;
+      user-select: none;
+    }
+    #debug {
+      background: rgba(0,0,0,0.2);
+      font-size: 0.8rem;
+      max-height: 160px;
+      overflow-y: auto;
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-family: monospace;
+      color: #ccc;
+      user-select: text;
+    }
+    footer {
+      margin: 0.5rem;
+      font-size: 0.9rem;
+      color: #eee;
+      text-align: center;
+      user-select: none;
+    }
+    .goblin-style {
+      font-family: 'Papyrus', fantasy;
+      color: #556b2f;
+      text-shadow: 1px 1px 0 #9acd32, 2px 2px 2px #333;
+    }
+  </style>
 </head>
 <body>
-  <h1>🎤 Vibe Goblin Karaoke 🐸</h1>
-  <p>Summon the goblin. Slay the mic.</p>
+  <header class="goblin-style">Vibe Goblin Karaoke 🎤🧙‍♂️</header>
 
-  <select id="song-select">
-    <option value="bouncyChill">🎶 Bouncy Chill</option>
-  </select>
+  <main>
+    <label for="song-select">Choose your track:</label>
+    <select id="song-select">
+      <option value="twinkle">Twinkle Twinkle Little Star</option>
+      <!-- Add more tracks here later -->
+    </select>
 
-  <audio id="karaoke-audio" controls style="margin: 10px;"></audio>
+    <button id="start-btn" disabled>Start Karaoke</button>
+    <button id="stop-btn" disabled>Stop Karaoke</button>
 
-  <button id="start-btn">▶️ Start Karaoke</button>
-  <button id="stop-btn" disabled>⏹️ Stop</button>
+    <div id="lyrics">Select a song and press Start Karaoke!</div>
 
-  <div id="lyrics" class="lyrics-box">Lyrics will appear here...</div>
+    <audio id="karaoke-audio" crossorigin="anonymous"></audio>
 
-  <button id="clear-log-btn" style="margin-top: 20px;">🧹 Clear Log</button>
+    <button id="clear-log-btn" style="margin-top: 1rem;">🧹 Clear Log</button>
 
-  <div id="debug" class="debug-box"></div>
+    <div id="debug"></div>
+  </main>
+
+  <footer>Made with goblin magic 🧙‍♂️✨</footer>
 
   <script src="script.js"></script>
 </body>
