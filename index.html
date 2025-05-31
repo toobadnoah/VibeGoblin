@@ -2,18 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>VibeGoblin</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KaraokeCast</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <h1>🧙‍♂️ VibeGoblin</h1>
-  <p>Welcome, mortal. Tap below to summon today's vibe. 🌌</p>
-  <button onclick="showVibe()">Summon Vibe</button>
-  <p id="vibe-output" class="vibe-box"></p>
-  <p id="streak" class="streak-box"></p>
-  <div id="badge-container" class="badge-gallery"></div>
+  <h1>🎤 KaraokeCast</h1>
+  <p>Sing along and record your vibe!</p>
+
+  <audio id="karaoke-audio" src="https://cdn.pixabay.com/audio/2022/03/02/audio_73dd5f6f64.mp3"></audio>
+
+  <button id="start-btn">▶️ Start Karaoke</button>
+  <button id="stop-btn" disabled>⏹️ Stop</button>
+  <button id="play-recording-btn" disabled>🔁 Play My Recording</button>
+
+  <div id="lyrics" class="lyrics-box">Lyrics will appear here...</div>
+
+  <audio id="recording-playback" controls style="display: none;"></audio>
 
   <script src="script.js"></script>
 </body>
