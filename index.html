@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Burger Flip Challenge 🍔</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to top right, #ffecd2, #fcb69f);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin-top: 10px;
+      color: #333;
+      font-size: 2em;
+    }
+
+    .game-container {
+      position: relative;
+      width: 90%;
+      max-width: 400px;
+      height: 500px;
+      background: #fff8f0;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .burger {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+      background: #f4a261;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .flip-zone {
+      position: absolute;
+      bottom: 130px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 20px;
+      background: rgba(0, 0, 0, 0.1);
+      border: 2px dashed #333;
+      border-radius: 10px;
+    }
+
+    .timer-bar {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      height: 10px;
+      background: #e76f51;
+      border-radius: 10px;
+      transition: width 0.1s;
+    }
+
+    .flip-button {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      background: #2a9d8f;
+      color: white;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .flip-button:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    .result {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 1.4em;
+      color: #264653;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🍔 Vibe Goblin Flip</h1>
+  <div class="game-container">
+    <div class="timer-bar" id="timerBar"></div>
+    <div class="flip-zone" id="flipZone"></div>
+    <div class="burger" id="burger"></div>
+    <button class="flip-button" onclick="flipBurger()">FLIP!</button>
+    <div class="result" id="resultText"></div>
+  </div>
+
+  <script>
+    let burger = document.getElementById('burger');
+    let zone = document.getElementById('flipZone');
+    let resultText = document.getElementById('resultText');
+    let timerBar = document.getElementById('timerBar');
+
+    let totalTime = 3000; // 3 seconds
+    let remainingTime = totalTime;
+    let burgerInZone = false;
+    let interval;
+
+    function startGame() {
+      resultText.textContent = '';
+      remainingTime = totalTime;
+      burgerInZone = false;
+
+      // Reset burger
+      burger.style.bottom = '60px';
+      burger.style.transition = 'transform 0.3s ease';
+
+      // Animate burger up to zone
+      setTimeout(() => {
+        burger.style.transform = 'translate(-50%, -80px)';
+        burgerInZone = true;
+      }, 500);
+
+      // Shrinking time bar
+      timerBar.style.width = '100%';
+      interval = setInterval(() => {
+        remainingTime -= 100;
+        timerBar.style.width = `${(remainingTime / totalTime) * 100}%`;
+
+        if (remainingTime <= 0) {
+          clearInterval(interval);
+          evaluateFlip(false);
+        }
+      }, 100);
+    }
+
+    function flipBurger() {
+      clearInterval(interval);
+
+      if (burgerInZone && remainingTime > 500) {
+        evaluateFlip(true);
+      } else {
+        evaluateFlip(false);
+      }
+    }
+
+    function evaluateFlip(success) {
+      if (success) {
+        resultText.textContent = '🔥 Perfect Flip!';
+      } else {
+        resultText.textContent = '😢 Missed it!';
+      }
+
+      setTimeout(startGame, 2000);
+    }
+
+    // Start the first round
+    startGame();
+  </script>
+</body>
+</html>
