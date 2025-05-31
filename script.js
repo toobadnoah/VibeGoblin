@@ -7,22 +7,17 @@ const recordingPlayback = document.getElementById("recording-playback");
 const songSelect = document.getElementById("song-select");
 
 const tracks = {
-  track1: {
-    src: "https://cdn.pixabay.com/audio/2022/03/02/audio_73dd5f6f64.mp3",
+  bouncyChill: {
+    src: "https://cdn.pixabay.com/audio/2023/03/13/audio_c2437f768b.mp3",
     lyrics: [
-      { time: 0, text: "🎵 This is the first line" },
-      { time: 3, text: "🎵 Second line, you sing now" },
-      { time: 6, text: "🎵 Keep it going, feel the vibe" },
-      { time: 9, text: "🎵 Last line, wrap it up!" }
-    ]
-  },
-  track2: {
-    src: "https://cdn.pixabay.com/audio/2022/03/08/audio_dcf59b57ba.mp3",
-    lyrics: [
-      { time: 0, text: "🎶 Let's go again" },
-      { time: 3, text: "🎶 Feel the beat, pretend" },
-      { time: 6, text: "🎶 Voices echo in the night" },
-      { time: 9, text: "🎶 You shine so bright!" }
+      { time: 0, text: "🎤 Step to the mic, take your stance" },
+      { time: 4, text: "🎤 Feel the beat, now start to dance" },
+      { time: 8, text: "🎤 Words are flowin', lines are tight" },
+      { time: 12, text: "🎤 You own the stage, you shine so bright" },
+      { time: 16, text: "🎤 Take a breath, the crowd is wild" },
+      { time: 20, text: "🎤 This karaoke’s got you styled" },
+      { time: 24, text: "🎤 Final bar, let's end it strong" },
+      { time: 28, text: "🎤 Thanks for vibin', sing along!" }
     ]
   }
 };
@@ -53,11 +48,9 @@ startBtn.onclick = async () => {
   startBtn.disabled = true;
   stopBtn.disabled = false;
 
-  // Start playing audio
   audio.currentTime = 0;
   audio.play();
 
-  // Start recording
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   mediaRecorder = new MediaRecorder(stream);
   recordedChunks = [];
@@ -75,7 +68,6 @@ startBtn.onclick = async () => {
 
   mediaRecorder.start();
 
-  // Start synced lyrics
   lyricInterval = setInterval(() => {
     const currentTime = Math.floor(audio.currentTime);
     if (track.lyrics[currentLine] && currentTime >= track.lyrics[currentLine].time) {
@@ -99,5 +91,5 @@ playRecordingBtn.onclick = () => {
   recordingPlayback.play();
 };
 
-// Load default track on page load
+// Load default track
 loadTrack(songSelect.value);
