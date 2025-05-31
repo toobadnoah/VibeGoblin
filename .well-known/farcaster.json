@@ -1,0 +1,14 @@
+{
+  "frame": {
+    "version": "1",
+    "name": "VibeGoblin",
+    "iconUrl": "https://toobadnoah.github.io/VibeGoblin/icon.png",
+    "homeUrl": "https://toobadnoah.github.io/VibeGoblin",
+    "imageUrl": "https://toobadnoah.github.io/VibeGoblin/preview.png",
+    "splashImageUrl": "https://toobadnoah.github.io/VibeGoblin/splash.png",
+    "splashBackgroundColor": "#121212",
+    "tags": ["fun", "social"],
+    "primaryCategory": "entertainment",
+    "description": "Get your daily vibes with VibeGoblin!"
+  }
+}
