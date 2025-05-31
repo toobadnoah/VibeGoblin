@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🍔 Vibe Goblin Flip</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', cursive;
+      background: linear-gradient(to top right, #c0f7e8, #fceabb);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin: 10px;
+      font-size: 2em;
+      color: #2d2d2d;
+      text-shadow: 1px 1px #fff;
+    }
+
+    .game-container {
+      position: relative;
+      width: 90%;
+      max-width: 400px;
+      height: 560px;
+      background: #fffdf5;
+      border: 5px dashed #5f4b32;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .burger {
+      position: absolute;
+      bottom: 90px;
+      font-size: 60px;
+      transition: transform 0.2s ease;
+    }
+
+    .flip-zone {
+      position: absolute;
+      bottom: 180px;
+      width: 80px;
+      height: 30px;
+      border: 3px dashed #ff6f61;
+      border-radius: 10px;
+    }
+
+    .timer-bar-bg {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: calc(100% - 20px);
+      height: 10px;
+      background: #ddd;
+      border-radius: 5px;
+    }
+
+    .timer-bar {
+      height: 100%;
+      background: #f44336;
+      width: 100%;
+      border-radius: 5px;
+      transition: width 0.1s;
+    }
+
+    .flip-button {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #009688;
+      color: white;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .flip-button:active {
+      transform: translateX(-50%) scale(0.97);
+    }
+
+    .result, .score {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.6em;
+      color: #4e342e;
+      background: #ffffffcc;
+      padding: 10px 20px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .score {
+      top: 40px;
+      font-size: 1.2em;
+      background: none;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍔 Vibe Goblin Flip</h1>
+  <div class="game-container">
+    <div class="timer-bar-bg"><div class="timer-bar" id="timerBar"></div></div>
+    <div class="score" id="scoreDisplay">Score: 0</div>
+    <div class="flip-zone" id="flipZone"></div>
+    <div class="burger" id="burger">🍔</div>
+    <button class="flip-button" onclick="flipBurger()">FLIP!</button>
+    <div class="result" id="resultText"></div>
+  </div>
+
+  <script>
+    let timerBar = document.getElementById("timerBar");
+    let resultText = document.getElementById("resultText");
+    let scoreDisplay = document.getElementById("scoreDisplay");
+    let burger = document.getElementById("burger");
+    let flipZone = document.getElementById("flipZone");
+
+    let totalTime = 30000;
+    let gameTimer;
+    let flipInterval;
+    let burgerX = 50;
+    let zoneX = 50;
+    let score = 0;
+    let combo = 0;
+
+    function updatePositions() {
+      burgerX += (Math.random() * 10 - 5);
+      burgerX = Math.max(10, Math.min(90, burgerX));
+      burger.style.left = burgerX + '%';
+
+      zoneX += (Math.random() * 10 - 5);
+      zoneX = Math.max(10, Math.min(90, zoneX));
+      flipZone.style.left = zoneX + '%';
+    }
+
+    function flipBurger() {
+      const burgerRect = burger.getBoundingClientRect();
+      const zoneRect = flipZone.getBoundingClientRect();
+      const burgerCenter = burgerRect.left + burgerRect.width / 2;
+
+      if (burgerCenter >= zoneRect.left && burgerCenter <= zoneRect.right) {
+        combo++;
+        score += 10 + combo * 2;
+        resultText.innerText = "🔥 Combo x" + combo + "!";
+        resultText.style.color = "#009688";
+      } else {
+        combo = 0;
+        resultText.innerText = "❌ Missed!";
+        resultText.style.color = "#f44336";
+        navigator.vibrate?.(100);
+      }
+
+      resultText.style.display = "block";
+      setTimeout(() => resultText.style.display = "none", 800);
+      scoreDisplay.innerText = "Score: " + score;
+    }
+
+    function startGame() {
+      score = 0;
+      combo = 0;
+      scoreDisplay.innerText = "Score: 0";
+      gameTimer = totalTime;
+      let intervalTime = 100;
+      flipInterval = setInterval(() => {
+        gameTimer -= intervalTime;
+        timerBar.style.width = `${(gameTimer / totalTime) * 100}%`;
+        updatePositions();
+        if (gameTimer <= 0) {
+          clearInterval(flipInterval);
+          resultText.innerText = "🏁 Final Score: " + score;
+          resultText.style.display = "block";
+        }
+      }, intervalTime);
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
