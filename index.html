@@ -1,1 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vibe Goblin Burger Flip 🍔</title>
+<style>
+  /* Reset & body */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin:0; padding:0;
+    background: linear-gradient(135deg, #5a3e1b, #a37f34);
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    user-select: none;
+    height: 100vh;
+    color: #2a1605;
+  }
 
+  h1 {
+    margin: 1rem 0 0.5rem 0;
+    text-shadow: 2px 2px 4px #2f6300;
+  }
+
+  #scoreboard {
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+    text-shadow: 1px 1px 2px #7f8a1f;
+  }
+
+  #message {
+    min-height: 28px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #174000;
+    margin-bottom: 1rem;
+    text-shadow: 1px 1px 2px #8fb94f;
+  }
+
+  #start-btn {
+    background: #355e00;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    color: #cff47a;
+    cursor: pointer;
+    box-shadow: 0 0 8px #6abf00 inset;
+    margin-bottom: 1rem;
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  #start-btn:hover:not(:disabled) {
+    background: #548f00;
+  }
+  #start-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  #game-area {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: linear-gradient(to bottom, #7f7f4d 0%, #504c20 100%);
+    border-radius: 15px;
+    box-shadow: inset 0 0 30px #263100;
+    overflow: hidden;
+  }
+
+  /* Grill base */
+  #grill {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 120px;
+    background: repeating-linear-gradient(
+      45deg,
+      #553300,
+      #553300 6px,
+      #a66f2e 6px,
+      #a66f2e 12px
+    );
+    box-shadow: inset 0 5px 20px rgba(0,0,0,0.6);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+
+  /* Perfect flip zone highlight */
+  #perfect-zone {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 40px;
+    background: rgba(130, 220, 0, 0.3);
+    border-radius: 20px;
+    border: 2px dashed #9fe840;
+    pointer-events: none;
+    filter: drop-shadow(0 0 5px #9fe840);
+  }
+
+  /* Burger container */
+  #burger {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform-style: preserve-3d;
+    transform-origin: center bottom;
+    width: 110px;
+    height: 90px;
+    cursor: pointer;
+    user-select: none;
+    filter: drop-shadow(0 3px 1px rgba(0,0,0,0.5));
+    transition: transform 0.6s ease;
+  }
+
+  /* Burger layers: bun top, lettuce, cheese, patty, bun bottom */
+  .layer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px;
+    width: 90px;
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.2);
+  }
+  .bun-top {
+    top: 0;
+    height: 30px;
+    background: linear-gradient(145deg, #d99846, #a15a0a);
+    border-radius: 45% 45% 55% 55% / 65% 65% 35% 35%;
+    box-shadow:
+      inset 0 6px 5px #ffcc66,
+      inset 0 -4px 3px #7d4b0c;
+  }
+  .lettuce {
+    top: 28px;
+    height: 12px;
+    background: linear-gradient(120deg, #7fcc54, #4b772d);
+    border-radius: 35% 35% 55% 55% / 80% 80% 40% 40%;
+    box-shadow: inset 0 3px 5px #33591a;
+  }
+  .cheese {
+    top: 38px;
+    height: 10px;
+    background: linear-gradient(45deg, #ffdb4d, #f1c232);
+    border-radius: 15% 15% 55% 55% / 80% 80% 30% 30%;
+    box-shadow: inset 0 2px 4px #c7991b;
+  }
+  .patty {
+    top: 46px;
+    height: 20px;
+    background: linear-gradient(145deg, #4a2c16, #2b1707);
+    border-radius: 20% 20% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: inset 0 5px 8px #1a0d00;
+  }
+  .bun-bottom {
+    top: 66px;
+    height: 24px;
+    background: linear-gradient(150deg, #d99846, #a15a0a);
+    border-radius: 50% / 60%;
+    box-shadow:
+      inset 0 -5px 5px #7d4b0c,
+      inset 0 3px 4px #ffcc66;
+  }
+
+</style>
+</head>
+<body>
+  <h1>Vibe Goblin Burger Flip 🍔</h1>
+  <div id="scoreboard">Score: 0</div>
+  <div id="message"></div>
+  <button id="start-btn">Start Game</button>
+  <div id="game-area">
+    <div id="perfect-zone"></div>
+    <!-- Burger will be created dynamically -->
+    <div id="grill"></div>
+  </div>
+
+<script>
+  const gameArea = document.getElementById('game-area');
+  const scoreboard = document.getElementById('scoreboard');
+  const message = document.getElementById('message');
+  const startBtn = document.getElementById('start-btn');
+  const perfectZone = document.getElementById('perfect-zone');
+
+  const PERFECT_ZONE_TOP = gameArea.clientHeight - 120 - 40; // y coordinate where perfect zone top starts
+  const PERFECT_ZONE_BOTTOM = gameArea.clientHeight - 120; // bottom edge of perfect zone
+  const BURGER_FALL_MAX = gameArea.clientHeight - 120 - 80; // max fall before burn
+
+  let burger = null;
+  let burgerY = 0;
+  let velocity = 0;
+  let acceleration = 0.15; // gravity effect
+  let flipping = false;
+  let score = 0;
+  let gameRunning = false;
+
+  function createBurger() {
+    burger = document.createElement('div');
+    burger.id = 'burger';
+
+    // Add burger layers
+    const layers = [
+      {class: 'bun-top'},
+      {class: 'lettuce'},
+      {class: 'cheese'},
+      {class: 'patty'},
+      {class: 'bun-bottom'}
+    ];
+    layers.forEach(layer => {
+      const div = document.createElement('div');
+      div.className = 'layer ' + layer.class;
+      burger.appendChild(div);
+    });
+
+    burger.style.top = '0px';
+    burger.style.transform = 'translateX(-50%) rotateX(0deg) rotateY(0deg)';
+    gameArea.appendChild(burger);
+
+    burgerY = 0;
+    velocity = 0;
+    flipping = false;
+
+    burger.onclick = () => {
+      if (!gameRunning) return;
+      if (flipping) return;
+      flipBurger();
+    };
+  }
+
+  function flipBurger() {
+    flipping = true;
+
+    // Calculate how close burger is to perfect zone center
+    const burgerCenter = burgerY + 40; // approx center y of burger
+    const zoneCenter = (PERFECT_ZONE_TOP + PERFECT_ZONE_BOTTOM) / 2;
+    const distance = Math.abs(burgerCenter - zoneCenter);
+
+    // Flip animation: rotateX 720deg (2 spins)
+    burger.style.transition = 'transform 0.7s ease-in-out';
+    burger.style.transform = `translateX(-50%) rotateX(720deg)`;
+
+    // Scoring based on distance
+    let points = 0;
+    if (distance < 15) {
+      points = 20;
+      message.textContent = '🔥 Perfect Flip! +20 points';
+    } else if (distance < 40) {
+      points = 10;
+      message.textContent = '👍 Good Flip! +10 points';
+    } else {
+      points = -5;
+      message.textContent = '😵‍💫 Bad Flip! -5 points';
+    }
+    score += points;
+    updateScore();
+
+    // Reset after animation
+    setTimeout(() => {
+      if (!burger) return;
+      burger.style.transition = 'none';
+      burger.style.transform = 'translateX(-50%) rotateX(0deg)';
+      flipping = false;
+    }, 700);
+  }
+
+  function updateScore() {
+    scoreboard.textContent = `Score: ${score}`;
+  }
+
+  function gameOver() {
+    gameRunning = false;
+    message.textContent = 'Game Over! Refresh to play again.';
+    if (burger) {
+      burger.remove();
+      burger = null;
+    }
+    startBtn.disabled = false;
+  }
+
+  function gameLoop() {
+    if (!gameRunning) return;
+
+    velocity += acceleration;
+    burgerY += velocity;
+
+    if (burger) burger.style.top = burgerY + 'px';
+
+    // Check burn (fell past grill bottom)
+    if (burgerY >= BURGER_FALL_MAX) {
+      score -= 10;
+      updateScore();
+      message.textContent = '🔥 Burger Burned! -10 points';
+      gameOver();
+      return;
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  startBtn.onclick = () => {
+    if (gameRunning) return;
+    score = 0;
+    updateScore();
+    message.textContent = '';
+    startBtn.disabled = true;
+    if (burger) {
+      burger.remove();
+      burger = null;
+    }
+    createBurger();
+    gameRunning = true;
+    velocity = 0;
+    burgerY = 0;
+    gameLoop();
+  };
+</script>
+</body>
+</html>
