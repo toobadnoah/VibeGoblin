@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vibe Goblin: Burger Flip</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    #gameArea {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: radial-gradient(#222, #000);
+    }
+
+    .hand {
+      position: absolute;
+      bottom: 20px;
+      width: 80px;
+      height: 80px;
+      background: #0f0;
+      border-radius: 10px;
+      opacity: 0.8;
+    }
+
+    .left-hand {
+      left: 20px;
+    }
+
+    .right-hand {
+      right: 20px;
+    }
+
+    #burger {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      background: #f90;
+      border-radius: 30px;
+      transform: translate(-50%, -50%);
+    }
+
+    #startButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background: #6f2;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #timer {
+      font-size: 2em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍔 Vibe Goblin: Burger Flip</h1>
+  <div id="gameArea">
+    <div id="burger"></div>
+    <div class="hand left-hand"></div>
+    <div class="hand right-hand"></div>
+  </div>
+  <button id="startButton">Start Flip Challenge</button>
+  <div id="timer">⏱️ 10s</div>
+
+  <script>
+    const burger = document.getElementById('burger');
+    const startBtn = document.getElementById('startButton');
+    const timerEl = document.getElementById('timer');
+    let timeLeft = 10;
+    let score = 0;
+    let timerInterval;
+    let isFlipping = false;
+
+    function startGame() {
+      score = 0;
+      timeLeft = 10;
+      timerEl.textContent = `⏱️ ${timeLeft}s`;
+      burger.style.top = '50%';
+      burger.style.left = '50%';
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏱️ ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          alert(`Time's up! Your flips: ${score}`);
+        }
+      }, 1000);
+    }
+
+    burger.addEventListener('click', () => {
+      if (timeLeft > 0) {
+        // Flip burger to a random position
+        const top = Math.random() * 80 + 10;
+        const left = Math.random() * 80 + 10;
+        burger.style.top = `${top}%`;
+        burger.style.left = `${left}%`;
+        score++;
+      }
+    });
+
+    startBtn.addEventListener('click', startGame);
+  </script>
+</body>
+</html>
