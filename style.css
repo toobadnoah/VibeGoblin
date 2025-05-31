@@ -1,7 +1,6 @@
-
 body {
   background: #1C0F30;
-  color: #F8F4FF;
+  color: #B8A0D3;
   font-family: 'Comic Sans MS', cursive, sans-serif;
   text-align: center;
   padding: 40px;
@@ -32,7 +31,7 @@ button {
   font-size: 18px;
   background-color: #91288D;
   border: none;
-  color: #F8F4FF;
+  color: #B8A0D3;
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -40,9 +39,9 @@ button {
 
 button:hover {
   background-color: #D96DCD;
-  box-shadow: 0 0 10px #F8F4FF;
+  box-shadow: 0 0 10px #B8A0D3;
 }
 
 #shareHint {
-  color: #F8F4FF;
+  color: #B8A0D3;
 }
