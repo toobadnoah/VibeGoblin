@@ -30,58 +30,74 @@ let recordedChunks = [];
 function loadTrack(trackKey) {
   const track = tracks[trackKey];
   audio.src = track.src;
+  lyricsBox.innerText = "Lyrics will appear here...";
+  currentLine = 0;
+  clearInterval(lyricInterval);
 }
 
 songSelect.addEventListener("change", () => {
   loadTrack(songSelect.value);
-  lyricsBox.innerText = "Lyrics will appear here...";
   startBtn.disabled = false;
   playRecordingBtn.disabled = true;
   recordingPlayback.style.display = "none";
 });
 
 startBtn.onclick = async () => {
-  const track = tracks[songSelect.value];
-  currentLine = 0;
-  lyricsBox.innerText = "";
-  playRecordingBtn.disabled = true;
   startBtn.disabled = true;
   stopBtn.disabled = false;
+  playRecordingBtn.disabled = true;
+
+  recordedChunks = [];
+  currentLine = 0;
+  lyricsBox.innerText = "";
 
   audio.currentTime = 0;
-  audio.play();
 
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  mediaRecorder = new MediaRecorder(stream);
-  recordedChunks = [];
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
 
-  mediaRecorder.ondataavailable = event => {
-    if (event.data.size > 0) recordedChunks.push(event.data);
-  };
+    mediaRecorder.ondataavailable = e => {
+      if (e.data.size > 0) recordedChunks.push(e.data);
+    };
 
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(recordedChunks, { type: "audio/webm" });
-    recordingPlayback.src = URL.createObjectURL(blob);
-    recordingPlayback.style.display = "block";
-    playRecordingBtn.disabled = false;
-  };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: "audio/webm" });
+      recordingPlayback.src = URL.createObjectURL(blob);
+      recordingPlayback.style.display = "block";
+      playRecordingBtn.disabled = false;
+    };
 
-  mediaRecorder.start();
+    mediaRecorder.start();
 
-  lyricInterval = setInterval(() => {
-    const currentTime = Math.floor(audio.currentTime);
-    if (track.lyrics[currentLine] && currentTime >= track.lyrics[currentLine].time) {
-      lyricsBox.innerText = track.lyrics[currentLine].text;
-      currentLine++;
-    }
-  }, 500);
+    audio.play();
+
+    // Wait for audio to be ready to play lyrics syncing
+    audio.onplay = () => {
+      if (lyricInterval) clearInterval(lyricInterval);
+      lyricInterval = setInterval(() => {
+        const currentTime = Math.floor(audio.currentTime);
+        const trackLyrics = tracks[songSelect.value].lyrics;
+
+        if (currentLine < trackLyrics.length && currentTime >= trackLyrics[currentLine].time) {
+          lyricsBox.innerText = trackLyrics[currentLine].text;
+          currentLine++;
+        }
+      }, 300);
+    };
+  } catch (err) {
+    alert("Microphone access is required to record your singing!");
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+  }
 };
 
 stopBtn.onclick = () => {
   audio.pause();
   audio.currentTime = 0;
-  mediaRecorder.stop();
+  if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
   clearInterval(lyricInterval);
+
   lyricsBox.innerText = "✨ Done! You can now replay your voice.";
   stopBtn.disabled = true;
   startBtn.disabled = false;
@@ -91,5 +107,5 @@ playRecordingBtn.onclick = () => {
   recordingPlayback.play();
 };
 
-// Load default track
+// Initialize default track on page load
 loadTrack(songSelect.value);
