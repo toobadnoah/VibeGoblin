@@ -8,9 +8,14 @@
 </head>
 <body>
   <h1>🎤 KaraokeCast</h1>
-  <p>Sing along and record your vibe!</p>
+  <p>Pick a track and sing your heart out</p>
 
-  <audio id="karaoke-audio" src="https://cdn.pixabay.com/audio/2022/03/02/audio_73dd5f6f64.mp3"></audio>
+  <select id="song-select">
+    <option value="track1">🎵 Chill Beat</option>
+    <option value="track2">🎶 Bouncy Bop</option>
+  </select>
+
+  <audio id="karaoke-audio"></audio>
 
   <button id="start-btn">▶️ Start Karaoke</button>
   <button id="stop-btn" disabled>⏹️ Stop</button>
