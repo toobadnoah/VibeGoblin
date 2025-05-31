@@ -1,1 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vibe Goblin: Flip Frenzy — Timing Challenge</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom, #222, #111);
+      color: white;
+      text-align: center;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    h1 {
+      margin: 20px 0 10px;
+    }
+
+    #gameArea {
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #burger {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(#f90, #c60);
+      box-shadow: 0 4px 10px #000;
+      transition: transform 0.2s;
+      cursor: pointer;
+      margin-bottom: 30px;
+    }
+
+    #burger.flipped {
+      animation: pop 0.2s;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3) rotate(10deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    #startButton {
+      margin: 15px auto;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      background: #0f0;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #score, #timer {
+      font-size: 1.3em;
+      margin: 5px;
+      user-select: none;
+    }
+
+    /* Time Bar Container */
+    #timeBarContainer {
+      width: 90%;
+      height: 20px;
+      background: #444;
+      margin: 10px auto 40px;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Moving Bar */
+    #movingBar {
+      position: absolute;
+      height: 100%;
+      width: 15%;
+      background: limegreen;
+      border-radius: 10px;
+      left: 0;
+      animation: moveBar 2s linear infinite;
+    }
+
+    /* Target Zone */
+    #targetZone {
+      position: absolute;
+      height: 100%;
+      width: 20%;
+      background: rgba(255, 255, 255, 0.25);
+      border: 2px solid white;
+      top: 0;
+      left: 40%;
+      border-radius: 10px;
+      pointer-events: none;
+    }
+
+    @keyframes moveBar {
+      0% { left: 0%; }
+      50% { left: 85%; }
+      100% { left: 0%; }
+    }
+
+  </style>
+</head>
+<body>
+  <h1>🍔 Vibe Goblin: Flip Frenzy</h1>
+
+  <div id="timeBarContainer">
+    <div id="targetZone"></div>
+    <div id="movingBar"></div>
+  </div>
+
+  <div id="gameArea">
+    <div id="burger"></div>
+  </div>
+
+  <div id="score">Score: 0</div>
+  <div id="timer">Time: 10s</div>
+  <button id="startButton">Start Game</button>
+
+  <script>
+    const burger = document.getElementById('burger');
+    const startButton = document.getElementById('startButton');
+    const timerDisplay = document.getElementById('timer');
+    const scoreDisplay = document.getElementById('score');
+    const movingBar = document.getElementById('movingBar');
+    const timeBarContainer = document.getElementById('timeBarContainer');
+    const targetZone = document.getElementById('targetZone');
+
+    let time = 10;
+    let score = 0;
+    let gameActive = false;
+    let countdownInterval;
+
+    // Helper to get numeric left position in %
+    function getMovingBarLeftPercent() {
+      const style = window.getComputedStyle(movingBar);
+      return parseFloat(style.left);
+    }
+
+    function isInTargetZone() {
+      // Get movingBar left & width
+      const barLeft = getMovingBarLeftPercent();
+      const barWidth = parseFloat(window.getComputedStyle(movingBar).width) / timeBarContainer.clientWidth * 100;
+
+      // Target zone left & width in %
+      const targetLeft = parseFloat(window.getComputedStyle(targetZone).left);
+      const targetWidth = parseFloat(window.getComputedStyle(targetZone).width) / timeBarContainer.clientWidth * 100;
+
+      // Check if any part of moving bar overlaps target zone
+      const barRight = barLeft + barWidth;
+      const targetRight = targetLeft + targetWidth;
+
+      return !(barRight < targetLeft || barLeft > targetRight);
+    }
+
+    function updateUI() {
+      timerDisplay.textContent = `Time: ${time}s`;
+      scoreDisplay.textContent = `Score: ${score}`;
+    }
+
+    function startGame() {
+      score = 0;
+      time = 10;
+      gameActive = true;
+      updateUI();
+      burger.style.pointerEvents = 'auto';
+      startButton.disabled = true;
+
+      countdownInterval = setInterval(() => {
+        time--;
+        updateUI();
+        if (time <= 0) {
+          clearInterval(countdownInterval);
+          gameActive = false;
+          burger.style.pointerEvents = 'none';
+          startButton.disabled = false;
+          alert(`⏰ Time's up! Final score: ${score}`);
+        }
+      }, 1000);
+    }
+
+    burger.addEventListener('click', () => {
+      if (!gameActive || time <= 0) return;
+
+      // Check if flip is perfect (in target zone)
+      if (isInTargetZone()) {
+        score += 2; // Perfect flip bonus
+        burger.style.background = 'linear-gradient(#ff0, #c90)';
+      } else {
+        score += 1; // Normal flip
+        burger.style.background = 'linear-gradient(#f90, #c60)';
+      }
+      updateUI();
+
+      burger.classList.add('flipped');
+      setTimeout(() => {
+        burger.classList.remove('flipped');
+        burger.style.background = 'linear-gradient(#f90, #c60)';
+      }, 200);
+    });
+
+    startButton.addEventListener('click', startGame);
+  </script>
+</body>
+</html>
