@@ -1,77 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 * {
   box-sizing: border-box;
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Press Start 2P', cursive, Arial, sans-serif;
   text-align: center;
   padding: 20px;
-  background-color: #f2f2f2;
+  background: #0f2a0f; /* dark green */
+  color: #a4f9a4; /* neon green */
   margin: 0;
 }
 
 h1 {
   font-size: 2em;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.3em;
+  text-shadow: 0 0 8px #4aff4a, 0 0 15px #1e7a1e;
 }
 
 p {
   font-size: 1em;
-  color: #666;
+  color: #7be77b;
+  margin-bottom: 20px;
+  text-shadow: 0 0 5px #39c639;
 }
 
+/* Goblin-themed buttons and select */
 select, button {
   padding: 12px;
   font-size: 1em;
   margin: 10px 5px;
-  border-radius: 6px;
-  border: none;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  border: 2px solid #7ae07a;
+  background-color: #143814;
+  color: #a4f9a4;
+  cursor: pointer;
+  box-shadow: 0 0 6px #5fdb5f;
+  transition: all 0.3s ease;
+  font-family: 'Press Start 2P', monospace;
 }
 
-select:focus, button:focus {
-  outline: none;
+select:hover, button:hover:not(:disabled) {
+  background-color: #3b763b;
+  box-shadow: 0 0 15px #7df67d;
 }
 
 button:disabled {
-  background-color: #ccc;
-  color: #666;
+  background-color: #224622;
+  color: #667766;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
+/* Lyrics box */
 .lyrics-box {
   margin-top: 30px;
   font-size: 1.5em;
   font-weight: bold;
-  color: #222;
   min-height: 60px;
-  padding: 10px;
-  background: #fff;
-  border-radius: 8px;
+  padding: 15px 25px;
+  background: #1a4d1a;
+  border-radius: 20px;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 20px #3eff3e;
+  color: #d0ffcc;
+  text-shadow: 0 0 6px #00ff00;
 }
 
+/* Audio player */
 audio {
   margin-top: 20px;
   width: 100%;
   max-width: 400px;
+  filter: drop-shadow(0 0 5px #33cc33);
+  border-radius: 12px;
+  background: #143814;
 }
 
+/* Responsive adjustments */
 @media (max-width: 600px) {
   h1 {
-    font-size: 1.6em;
+    font-size: 1.5em;
   }
 
   .lyrics-box {
     font-size: 1.2em;
+    padding: 10px 15px;
   }
 
   select, button {
-    font-size: 0.95em;
+    font-size: 0.9em;
     width: 90%;
     max-width: 300px;
   }
