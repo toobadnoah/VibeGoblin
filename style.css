@@ -1,99 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-* {
-  box-sizing: border-box;
-}
-
 body {
-  font-family: 'Press Start 2P', cursive, Arial, sans-serif;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background-color: #101010;
+  color: #00ff88;
   text-align: center;
   padding: 20px;
-  background: #0f2a0f;
-  color: #a4f9a4;
-  margin: 0;
 }
 
 h1 {
-  font-size: 2em;
-  margin-bottom: 0.3em;
-  text-shadow: 0 0 8px #4aff4a, 0 0 15px #1e7a1e;
+  font-size: 2.2em;
+  margin-bottom: 0.2em;
 }
 
-p {
-  font-size: 1em;
-  color: #7be77b;
-  margin-bottom: 20px;
-  text-shadow: 0 0 5px #39c639;
-}
-
-select, button {
-  padding: 12px;
-  font-size: 1em;
+button {
+  padding: 10px 20px;
   margin: 10px 5px;
-  border-radius: 12px;
-  border: 2px solid #7ae07a;
-  background-color: #143814;
-  color: #a4f9a4;
+  font-size: 1em;
+  background-color: #00ff88;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 0 6px #5fdb5f;
-  transition: all 0.3s ease;
-  font-family: 'Press Start 2P', monospace;
+  color: #101010;
+  transition: transform 0.1s;
 }
 
-select:hover, button:hover:not(:disabled) {
-  background-color: #3b763b;
-  box-shadow: 0 0 15px #7df67d;
-}
-
-button:disabled {
-  background-color: #224622;
-  color: #667766;
-  cursor: not-allowed;
-  box-shadow: none;
+button:hover {
+  transform: scale(1.05);
 }
 
 .lyrics-box {
   margin-top: 30px;
-  font-size: 1.5em;
+  font-size: 1.4em;
   font-weight: bold;
-  min-height: 60px;
-  padding: 15px 25px;
-  background: #1a4d1a;
-  border-radius: 20px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  box-shadow: 0 0 20px #3eff3e;
-  color: #d0ffcc;
-  text-shadow: 0 0 6px #00ff00;
-}
-
-audio {
-  margin-top: 20px;
-  width: 100%;
-  max-width: 400px;
-  filter: drop-shadow(0 0 5px #33cc33);
-  border-radius: 12px;
-  background: #143814;
-}
-
-@media (max-width: 600px) {
-  h1 {
-    font-size: 1.5em;
-  }
-
-  .lyrics-box {
-    font-size: 1.2em;
-    padding: 10px 15px;
-  }
-
-  select, button {
-    font-size: 0.9em;
-    width: 90%;
-    max-width: 300px;
-  }
-
-  body {
-    padding: 15px;
-  }
+  color: #00ffcc;
+  min-height: 2em;
 }
