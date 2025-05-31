@@ -3,7 +3,13 @@ function logDebug(msg) {
   const p = document.createElement("p");
   p.textContent = "🛠 " + msg;
   debug.appendChild(p);
+  debug.scrollTop = debug.scrollHeight; // auto-scroll to bottom
 }
+
+document.getElementById("clear-log-btn").addEventListener("click", () => {
+  document.getElementById("debug").innerHTML = "";
+  logDebug("🧹 Log cleared");
+});
 
 const audio = document.getElementById("karaoke-audio");
 const startBtn = document.getElementById("start-btn");
@@ -122,4 +128,6 @@ playRecordingBtn.onclick = () => {
   logDebug("Playing user recording");
 };
 
+// Load default
 loadTrack(songSelect.value);
+logDebug("✅ Debug system is active!");
