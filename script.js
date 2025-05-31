@@ -1,3 +1,10 @@
+function logDebug(msg) {
+  const debug = document.getElementById("debug");
+  const p = document.createElement("p");
+  p.textContent = "🛠 " + msg;
+  debug.appendChild(p);
+}
+
 const audio = document.getElementById("karaoke-audio");
 const startBtn = document.getElementById("start-btn");
 const stopBtn = document.getElementById("stop-btn");
@@ -33,6 +40,7 @@ function loadTrack(trackKey) {
   lyricsBox.innerText = "Lyrics will appear here...";
   currentLine = 0;
   clearInterval(lyricInterval);
+  logDebug("Loaded track: " + trackKey);
 }
 
 songSelect.addEventListener("change", () => {
@@ -59,6 +67,7 @@ startBtn.onclick = async () => {
 
     mediaRecorder.ondataavailable = e => {
       if (e.data.size > 0) recordedChunks.push(e.data);
+      logDebug("Captured audio chunk");
     };
 
     mediaRecorder.onstop = () => {
@@ -66,13 +75,14 @@ startBtn.onclick = async () => {
       recordingPlayback.src = URL.createObjectURL(blob);
       recordingPlayback.style.display = "block";
       playRecordingBtn.disabled = false;
+      logDebug("Recording stopped and ready");
     };
 
     mediaRecorder.start();
+    logDebug("Recording started");
 
     audio.play();
 
-    // Wait for audio to be ready to play lyrics syncing
     audio.onplay = () => {
       if (lyricInterval) clearInterval(lyricInterval);
       lyricInterval = setInterval(() => {
@@ -81,11 +91,13 @@ startBtn.onclick = async () => {
 
         if (currentLine < trackLyrics.length && currentTime >= trackLyrics[currentLine].time) {
           lyricsBox.innerText = trackLyrics[currentLine].text;
+          logDebug("Lyric: " + trackLyrics[currentLine].text);
           currentLine++;
         }
       }, 300);
     };
   } catch (err) {
+    logDebug("Microphone error: " + err.message);
     alert("Microphone access is required to record your singing!");
     startBtn.disabled = false;
     stopBtn.disabled = true;
@@ -101,11 +113,13 @@ stopBtn.onclick = () => {
   lyricsBox.innerText = "✨ Done! You can now replay your voice.";
   stopBtn.disabled = true;
   startBtn.disabled = false;
+
+  logDebug("Karaoke stopped");
 };
 
 playRecordingBtn.onclick = () => {
   recordingPlayback.play();
+  logDebug("Playing user recording");
 };
 
-// Initialize default track on page load
 loadTrack(songSelect.value);
